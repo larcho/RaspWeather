@@ -18,12 +18,12 @@ public:
 
 	enum { UNKNOWN, T0, OK, DONE };
 
-	RcOok(const int rxpin);
+	RcOok();
 	virtual ~RcOok();
-	uint8_t* getLastData(uint8_t &bits);
+	void nextPulse(const uint16_t width);
+	void getLastData(uint8_t *data, uint8_t &bits);
 
 private:
-	void handleInterrupt();
 	void gotBit(const char value);
 	void resetDecoder();
 	void manchester(char value);

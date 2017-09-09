@@ -9,11 +9,33 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <math.h>
+#include <signal.h>
+//#include <wiringPi.h>
 #include "OregonScientific.h"
 #include "MySQLConnection.h"
 #include "RcOok.h"
 
 using namespace std;
+
+RcOok ook;
+volatile sig_atomic_t stop;
+
+void inthand(int signum) {
+    stop = 1;
+}
+
+void handleInterrupt() {
+	static unsigned int duration;
+	static unsigned long lastTime;
+
+	//long time = micros();
+	//duration = time - lastTime;
+	//lastTime = time;
+	uint16_t width = (unsigned short int) duration;
+
+	ook.nextPulse(width);
+}
 
 int main() {
 
@@ -37,12 +59,16 @@ int main() {
 	delete con;
 	*/
 
-	RcOok *ook = new RcOok(0);
+	//wiringPiSetup();
+	//wiringPiISR(rxpin, INT_EDGE_BOTH, &handleInterrupt);
+
 	MySQLConnection *con = new MySQLConnection();
 
-	for(;;) {
+	signal(SIGINT, inthand);
+	while(!stop) {
 		uint8_t total_bits = 0;
-		uint8_t * data = ook->getLastData(total_bits);
+		uint8_t data[OOK_MAX_DATA_LEN];
+		ook.getLastData(data, total_bits);
 		if(total_bits > 0) {
 			OregonScientific os(data, total_bits);
 
@@ -55,11 +81,11 @@ int main() {
 			string rawValue = ss.str();
 
 			con->insertWeatherData(rawValue, os.getModelName(), os.getLowBattery(), os.getFirstValue());
-
 		}
+
+		sleep(1);
 	}
 
-	delete ook;
 	delete con;
 
 	return 0;
