@@ -8,9 +8,9 @@
 #ifndef MYSQLCONNECTION_H_
 #define MYSQLCONNECTION_H_
 
-#define HOST "unix:///tmp/mysql.sock"
+#define HOST "unix:///var/run/mysqld/mysqld.sock"
 #define USER "root"
-#define PASSWD ""
+#define PASSWD "root"
 
 #include "mysql_connection.h"
 #include <string>

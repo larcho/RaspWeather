@@ -7,16 +7,17 @@
 
 #include "RcOok.h"
 #include <stdio.h>
+#include <wiringPi.h>
 
-RcOok::RcOok():
+RcOok::RcOok(const int rxpin):
 total_bits(0),
 flip(0),
 state(UNKNOWN),
 pos(0),
 last_totalbits(0)
 {
-	// TODO Auto-generated constructor stub
-
+	wiringPiSetup();
+	wiringPiISR(rxpin, INT_EDGE_BOTH, this->handleInterrupt);
 }
 
 RcOok::~RcOok() {
@@ -28,9 +29,9 @@ void RcOok::handleInterrupt() {
 	static unsigned int duration;
 	static unsigned long lastTime;
 
-	//long time = micros();
-	//duration = time - lastTime;
-	//lastTime = time;
+	long time = micros();
+	duration = time - lastTime;
+	lastTime = time;
 	uint16_t width = (unsigned short int) duration;
 
 	if (200 <= width && width < 1200) {
@@ -89,4 +90,10 @@ void RcOok::resetDecoder () {
 void RcOok::manchester (char value) {
 	flip ^= value;
 	gotBit(flip);
+}
+
+uint8_t * RcOok::getLastData(uint8_t &bits) {
+	bits = last_totalbits;
+	last_totalbits = 0;
+	return last_data; 
 }

@@ -11,14 +11,16 @@
 #define OOK_MAX_DATA_LEN 25
 
 #include <stdlib.h>
+#include <stdint.h>
 
 class RcOok {
 public:
 
 	enum { UNKNOWN, T0, OK, DONE };
 
-	RcOok();
+	RcOok(const int rxpin);
 	virtual ~RcOok();
+	uint8_t* getLastData(uint8_t &bits);
 
 private:
 	void handleInterrupt();
