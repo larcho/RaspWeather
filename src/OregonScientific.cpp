@@ -10,8 +10,9 @@
 
 OregonScientific::OregonScientific(const uint8_t data[], const int bitcount):
 shifted_data(new uint8_t[(int)ceil(bitcount / 8.0f)]),
-valid(false),
-bitcount(bitcount)
+bitcount(bitcount),
+valid(false)
+
 {
 	//Tiene que haber al menos un 4 bits de sync, uno de checksum y otro de crc
 	if(bitcount < 3 * 8) {

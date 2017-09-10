@@ -11,7 +11,7 @@
 #include <sstream>
 #include <math.h>
 #include <signal.h>
-//#include <wiringPi.h>
+#include <wiringPi.h>
 #include "OregonScientific.h"
 #include "MySQLConnection.h"
 #include "RcOok.h"
@@ -29,9 +29,9 @@ void handleInterrupt() {
 	static unsigned int duration;
 	static unsigned long lastTime;
 
-	//long time = micros();
-	//duration = time - lastTime;
-	//lastTime = time;
+	long time = micros();
+	duration = time - lastTime;
+	lastTime = time;
 	uint16_t width = (unsigned short int) duration;
 
 	ook.nextPulse(width);
@@ -59,8 +59,8 @@ int main() {
 	delete con;
 	*/
 
-	//wiringPiSetup();
-	//wiringPiISR(rxpin, INT_EDGE_BOTH, &handleInterrupt);
+	wiringPiSetup();
+	wiringPiISR(0, INT_EDGE_BOTH, &handleInterrupt);
 
 	MySQLConnection *con = new MySQLConnection();
 
@@ -72,15 +72,9 @@ int main() {
 		if(total_bits > 0) {
 			OregonScientific os(data, total_bits);
 
-			stringstream ss;
-			ss << hex << uppercase;
+			cout << "GOT " << os.getHexValue() << endl;
 
-			for(int i = 0; i < (int)ceil(total_bits / 8); i++) {
-				ss << (uint16_t)data[i];
-			}
-			string rawValue = ss.str();
-
-			con->insertWeatherData(rawValue, os.getModelName(), os.getLowBattery(), os.getFirstValue());
+			con->insertWeatherData(os.getHexValue(), os.getModelName(), os.getLowBattery(), os.getFirstValue());
 		}
 
 		sleep(1);
