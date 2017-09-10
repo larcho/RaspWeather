@@ -19,6 +19,7 @@ class OregonScientific {
 public:
 	OregonScientific(const uint8_t data[], const int bitcount);
 	bool isValid();
+	string getHexValue();
 
 	uint16_t getModel();
 	string getModelName();
@@ -29,6 +30,7 @@ public:
 
 private:
 	uint8_t *shifted_data;
+	uint8_t bitcount;
 	bool valid;
 
 };

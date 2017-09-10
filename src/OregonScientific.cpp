@@ -9,7 +9,9 @@
 #include <math.h>
 
 OregonScientific::OregonScientific(const uint8_t data[], const int bitcount):
-shifted_data(new uint8_t[(int)ceil(bitcount / 8.0f)])
+shifted_data(new uint8_t[(int)ceil(bitcount / 8.0f)]),
+valid(false),
+bitcount(bitcount)
 {
 	//Tiene que haber al menos un 4 bits de sync, uno de checksum y otro de crc
 	if(bitcount < 3 * 8) {
@@ -55,6 +57,21 @@ OregonScientific::~OregonScientific() {
 
 bool OregonScientific::isValid() {
 	return this->valid;
+}
+
+string OregonScientific::getHexValue() {
+	static const char map[] = { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F' };
+	string returnValue = "";
+	for(uint8_t i = 0; i < bitcount; i += 4) {
+		uint8_t index = 0;
+		if(i % 8 == 0) {
+			index = this->shifted_data[i >> 3] >> 4;
+		} else {
+			index = this->shifted_data[i >> 3] & 0xF;
+		}
+		returnValue += map[index];
+	}
+	return returnValue;
 }
 
 uint16_t OregonScientific::getModel() {

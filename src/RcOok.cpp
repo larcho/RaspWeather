@@ -86,6 +86,7 @@ void RcOok::getLastData(uint8_t *data, uint8_t &bits)
 {
 	for(int i = 0; i < OOK_MAX_DATA_LEN; i++) {
 		data[i] = last_data[i];
+		last_data[i] = 0x0;
 	}
 
 	bits = last_totalbits;
