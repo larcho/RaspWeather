@@ -11,10 +11,13 @@
 #include <sstream>
 #include <math.h>
 #include <signal.h>
-#include <wiringPi.h>
 #include "OregonScientific.h"
 #include "MySQLConnection.h"
 #include "RcOok.h"
+
+#ifdef __arm__
+#include <wiringPi.h>
+#endif
 
 using namespace std;
 
@@ -27,11 +30,13 @@ void inthand(int signum) {
 
 void handleInterrupt() {
 	static unsigned int duration;
-	static unsigned long lastTime;
 
+#ifdef __arm__
+	static unsigned long lastTime;
 	long time = micros();
 	duration = time - lastTime;
 	lastTime = time;
+#endif
 	uint16_t width = (unsigned short int) duration;
 
 	ook.nextPulse(width);
@@ -39,30 +44,11 @@ void handleInterrupt() {
 
 int main() {
 
-	/*
-	uint8_t test_data[] = {0xCA, 0x48, 0x14, 0xD3, 0x80, 0x25, 0xC0, 0x73, 0x0};
-
-	OregonScientific* s = new OregonScientific(test_data, 68);
-	stringstream ss;
-	ss << hex << uppercase;
-
-	for(int i = 0; i < sizeof test_data; i++) {
-		ss << (uint16_t)test_data[i];
-	}
-	string rawValue = ss.str();
-
 	MySQLConnection *con = new MySQLConnection();
 
-	con->insertWeatherData(rawValue, s->getModelName(), s->getLowBattery(), s->getFirstValue());
-
-	delete s;
-	delete con;
-	*/
-
+#ifdef __arm__
 	wiringPiSetup();
 	wiringPiISR(0, INT_EDGE_BOTH, &handleInterrupt);
-
-	MySQLConnection *con = new MySQLConnection();
 
 	signal(SIGINT, inthand);
 	while(!stop) {
@@ -87,6 +73,16 @@ int main() {
 	}
 
 	delete con;
+
+#else
+	uint8_t test_data[] = {0xCA, 0x48, 0x14, 0xD3, 0x80, 0x25, 0xC0, 0x73, 0x0};
+	OregonScientific* s = new OregonScientific(test_data, 68);
+
+	con->insertWeatherData(s->getHexValue(), s->isValid(), s->getModelName(), s->getLowBattery(), s->getFirstValue());
+
+	delete s;
+	delete con;
+#endif
 
 	return 0;
 }
