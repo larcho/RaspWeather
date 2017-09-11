@@ -24,6 +24,7 @@ public:
 
 	void insertWeatherData(
 			const string &rawValue
+			, const bool isValid
 			, const string &deviceModel
 			, const bool battery
 			, const float value1

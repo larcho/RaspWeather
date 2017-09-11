@@ -32,17 +32,19 @@ MySQLConnection::~MySQLConnection() {
 
 void MySQLConnection::insertWeatherData(
 		const string &rawValue
+		, const bool isValid
 		, const string &deviceModel
 		, const bool battery
 		, const float value1
 		, const float value2)
 {
-	sql::PreparedStatement *stmt = this->con->prepareStatement("INSERT INTO oregon VALUES (NULL, ?, ?, ?, ?, ?, NOW())");
+	sql::PreparedStatement *stmt = this->con->prepareStatement("INSERT INTO oregon VALUES (NULL, ?, ?, ?, ?, ?, ?, NOW())");
 	stmt->setString(1, rawValue);
-	stmt->setString(2, deviceModel);
-	stmt->setBoolean(3, battery);
-	stmt->setDouble(4, value1);
-	stmt->setDouble(5, value2);
+	stmt->setBoolean(2, isValid);
+	stmt->setString(3, deviceModel);
+	stmt->setBoolean(4, battery);
+	stmt->setDouble(5, value1);
+	stmt->setDouble(6, value2);
 
 	stmt->execute();
 

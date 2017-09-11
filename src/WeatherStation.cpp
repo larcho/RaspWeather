@@ -74,7 +74,13 @@ int main() {
 
 			cout << "GOT " << os.getHexValue() << endl;
 
-			con->insertWeatherData(os.getHexValue(), os.getModelName(), os.getLowBattery(), os.getFirstValue());
+			con->insertWeatherData(
+					os.getHexValue()
+					, os.isValid()
+					, os.getModelName()
+					, os.getLowBattery()
+					, os.getFirstValue()
+					, os.getSecondValue());
 		}
 
 		sleep(1);

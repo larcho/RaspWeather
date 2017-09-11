@@ -25,6 +25,7 @@ public:
 	string getModelName();
 	bool getLowBattery();
 	float getFirstValue();
+	float getSecondValue();
 
 	virtual ~OregonScientific();
 
